@@ -1,0 +1,35 @@
+name: Render real-footage safe cut
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'generate_real_footage.sh'
+      - '.github/workflows/render-real-safe.yml'
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install FFmpeg and CJK fonts
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg fonts-noto-cjk curl
+      - name: Render 30s real-footage safe cut
+        run: |
+          chmod +x generate_real_footage.sh
+          ./generate_real_footage.sh
+      - name: Upload MP4
+        uses: actions/upload-artifact@v4
+        with:
+          name: pinglu-canal-30s-real-safe
+          path: output/pinglu_canal_30s_real_safe.mp4
+          if-no-files-found: error
+          retention-days: 30
+      - name: Upload attribution/source manifest
+        uses: actions/upload-artifact@v4
+        with:
+          name: source-and-license-notes
+          path: sources-real.md
+          retention-days: 30
