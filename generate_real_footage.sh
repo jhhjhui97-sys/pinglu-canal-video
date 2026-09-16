@@ -43,13 +43,13 @@ EOF
 
 ffmpeg -y -f concat -safe 0 -i output/concat.txt -c copy output/base.mp4
 
-# Energetic original synth bed; no external music copyright dependency.
+# Energetic original synth bed; fixed gains maximize compatibility across FFmpeg builds.
 ffmpeg -y \
   -i output/base.mp4 \
   -f lavfi -i 'sine=frequency=55:sample_rate=48000:duration=30' \
   -f lavfi -i 'sine=frequency=110:sample_rate=48000:duration=30' \
   -f lavfi -i 'sine=frequency=220:sample_rate=48000:duration=30' \
-  -filter_complex "[1:a]volume=0.07[a1];[2:a]volume='0.045*(0.55+0.45*sin(2*PI*t*2))'[a2];[3:a]volume='0.025*(0.55+0.45*sin(2*PI*t*4))'[a3];[a1][a2][a3]amix=3:normalize=0,afade=t=in:st=0:d=0.3,afade=t=out:st=29.3:d=0.7[a]" \
+  -filter_complex "[1:a]volume=0.07[a1];[2:a]volume=0.045[a2];[3:a]volume=0.025[a3];[a1][a2][a3]amix=inputs=3:normalize=0,afade=t=in:st=0:d=0.3,afade=t=out:st=29.3:d=0.7[a]" \
   -map 0:v -map '[a]' -c:v copy -c:a aac -b:a 192k -movflags +faststart -t 30 output/pinglu_canal_30s_real_safe.mp4
 
 ffprobe -v error -show_entries format=duration,size -of default=nw=1 output/pinglu_canal_30s_real_safe.mp4
