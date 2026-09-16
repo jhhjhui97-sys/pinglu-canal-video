@@ -1,0 +1,33 @@
+name: Render Pinglu Canal Video
+
+on:
+  push:
+    paths:
+      - 'generate_video.sh'
+      - '.github/workflows/render-video.yml'
+      - 'render-trigger.txt'
+  workflow_dispatch:
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install FFmpeg and CJK fonts
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg fonts-noto-cjk
+
+      - name: Render video
+        run: |
+          chmod +x generate_video.sh
+          ./generate_video.sh
+
+      - name: Upload MP4
+        uses: actions/upload-artifact@v4
+        with:
+          name: pinglu-canal-30s-video
+          path: output/pinglu_canal_30s.mp4
+          if-no-files-found: error
